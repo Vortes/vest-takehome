@@ -25,7 +25,7 @@ export interface TradingData {
 export function transformIntervalChartData(rawData: RawData[]): TradingData[] {
 	return rawData.map((data) => {
 		return {
-			time: data[0],
+			time: Math.floor(data[0] / 1000),
 			open: parseFloat(data[1]),
 			high: parseFloat(data[2]),
 			low: parseFloat(data[3]),
@@ -40,7 +40,7 @@ export function transformIntervalChartData(rawData: RawData[]): TradingData[] {
 
 export function transformLiveChartData(rawData: RawData): TradingData {
 	const liveData = {
-		time: rawData[0],
+		time: Math.floor(rawData[0] / 1000),
 		open: parseFloat(rawData[1]),
 		high: parseFloat(rawData[2]),
 		low: parseFloat(rawData[3]),

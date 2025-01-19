@@ -1,11 +1,16 @@
 "use client"
 
 import { useEffect, useRef } from "react"
-import { createChart, ColorType } from "lightweight-charts"
+import {
+	createChart,
+	ColorType,
+	IChartApi,
+	ISeriesApi,
+} from "lightweight-charts"
 import { TradingData } from "../utils/transform-chart"
 
 interface TradingChartProps {
-	liveTradingData: TradingData[] | null
+	liveTradingData: TradingData | null
 	intervalTradingData: TradingData[] | null
 }
 
@@ -14,13 +19,14 @@ const TradingChart: React.FC<TradingChartProps> = ({
 	intervalTradingData,
 }) => {
 	const chartContainerRef = useRef<HTMLDivElement>(null)
+	const chartRef = useRef<IChartApi | null>(null)
+	const seriesRef = useRef<ISeriesApi<"Candlestick"> | null>(null)
 
 	useEffect(() => {
-		if (!intervalTradingData || !chartContainerRef.current || !liveTradingData)
-			return
+		if (!intervalTradingData || !chartContainerRef.current) return
 
-		const chart = createChart(chartContainerRef.current, {
-			width: chartContainerRef.current.clientWidth,
+		chartRef.current = createChart(chartContainerRef.current, {
+			width: chartContainerRef.current?.clientWidth,
 			height: 400,
 			layout: {
 				background: { type: ColorType.Solid, color: "#ffffff" },
@@ -32,20 +38,21 @@ const TradingChart: React.FC<TradingChartProps> = ({
 			},
 		})
 
-		const candlestickSeries = chart.addCandlestickSeries({
+		seriesRef.current = chartRef.current.addCandlestickSeries({
 			upColor: "#26a69a",
 			downColor: "#ef5350",
 			borderVisible: false,
 			wickUpColor: "#26a69a",
 			wickDownColor: "#ef5350",
 		})
-
-		candlestickSeries.setData(intervalTradingData)
-		candlestickSeries.update(liveTradingData)
+		console.log(intervalTradingData)
+		seriesRef.current.setData(intervalTradingData)
 
 		const handleResize = () => {
-			if (chartContainerRef.current) {
-				chart.applyOptions({ width: chartContainerRef.current.clientWidth })
+			if (chartRef.current && chartContainerRef.current) {
+				chartRef.current.applyOptions({
+					width: chartContainerRef.current.clientWidth,
+				})
 			}
 		}
 
@@ -53,14 +60,22 @@ const TradingChart: React.FC<TradingChartProps> = ({
 
 		return () => {
 			window.removeEventListener("resize", handleResize)
-			chart.remove()
+			chartRef.current?.remove()
+			chartRef.current = null
+			seriesRef.current = null
 		}
-	}, [intervalTradingData, liveTradingData])
+	}, [intervalTradingData])
+
+	useEffect(() => {
+		if (liveTradingData && seriesRef.current) {
+			seriesRef.current.update(liveTradingData)
+		}
+	}, [liveTradingData])
 
 	return (
 		<div
 			ref={chartContainerRef}
-			className="w-full h-[400px]"
+			className="w-4/6 h-[400px] mt-20 ml-12"
 		/>
 	)
 }
