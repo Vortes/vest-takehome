@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import {
 	createChart,
 	ColorType,
@@ -14,6 +14,14 @@ interface TradingChartProps {
 	intervalTradingData: TradingData[] | null
 }
 
+interface OHLCData {
+	time: string
+	open: number
+	high: number
+	low: number
+	close: number
+}
+
 const TradingChart: React.FC<TradingChartProps> = ({
 	liveTradingData,
 	intervalTradingData,
@@ -21,20 +29,40 @@ const TradingChart: React.FC<TradingChartProps> = ({
 	const chartContainerRef = useRef<HTMLDivElement>(null)
 	const chartRef = useRef<IChartApi | null>(null)
 	const seriesRef = useRef<ISeriesApi<"Candlestick"> | null>(null)
+	const [hoveredData, setHoveredData] = useState<OHLCData>()
+
+	useEffect(() => {
+		if (chartRef.current) {
+			const handler = chartRef.current.subscribeCrosshairMove((param) => {
+				const candleData = param.seriesData.get(seriesRef.current) as OHLCData
+				setHoveredData(candleData)
+			})
+
+			return () => {
+				chartRef.current?.unsubscribeCrosshairMove(handler)
+			}
+		}
+	}, [liveTradingData])
 
 	useEffect(() => {
 		if (!intervalTradingData || !chartContainerRef.current) return
 
 		chartRef.current = createChart(chartContainerRef.current, {
-			width: chartContainerRef.current?.clientWidth,
-			height: 400,
+			height: chartContainerRef.current.clientHeight,
+			width: chartContainerRef.current.clientWidth,
 			layout: {
-				background: { type: ColorType.Solid, color: "#ffffff" },
-				textColor: "#333",
+				background: { type: ColorType.Solid, color: "#161514" },
+				textColor: "#d1d4dc",
 			},
 			grid: {
-				vertLines: { color: "#f0f0f0" },
-				horzLines: { color: "#f0f0f0" },
+				vertLines: { color: "#424242" },
+				horzLines: { color: "#424242" },
+			},
+			rightPriceScale: {
+				borderColor: "#2c2c2c",
+			},
+			timeScale: {
+				borderColor: "#2c2c2c",
 			},
 		})
 
@@ -45,7 +73,6 @@ const TradingChart: React.FC<TradingChartProps> = ({
 			wickUpColor: "#26a69a",
 			wickDownColor: "#ef5350",
 		})
-		console.log(intervalTradingData)
 		seriesRef.current.setData(intervalTradingData)
 
 		const handleResize = () => {
@@ -68,15 +95,26 @@ const TradingChart: React.FC<TradingChartProps> = ({
 
 	useEffect(() => {
 		if (liveTradingData && seriesRef.current) {
+			setHoveredData(liveTradingData)
 			seriesRef.current.update(liveTradingData)
 		}
 	}, [liveTradingData])
 
 	return (
-		<div
-			ref={chartContainerRef}
-			className="w-4/6 h-[400px] mt-20 ml-12"
-		/>
+		<div>
+			<div className="absolute top-0 left-0 z-10 p-2 font-mono text-sm">
+				<div className="flex gap-4 text-[#26a69a]">
+					<span>O {hoveredData?.open.toFixed(2)}</span>
+					<span>H {hoveredData?.high.toFixed(2)}</span>
+					<span>L {hoveredData?.low.toFixed(2)}</span>
+					<span>C {hoveredData?.close.toFixed(2)}</span>
+				</div>
+			</div>
+			<div
+				ref={chartContainerRef}
+				className="w-3/4 h-[551px]"
+			/>
+		</div>
 	)
 }
 

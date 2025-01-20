@@ -16,11 +16,12 @@ const WebSocketComponent: React.FC = () => {
 	useEffect(() => {
 		async function fetchIntervalTradingData() {
 			const res = await fetch(
-				"https://server-mmdev.vest.exchange/v2/klines?symbol=ETH-PERP&interval=1m&limit=500"
+				"https://server-mmdev.vest.exchange/v2/klines?symbol=ETH-PERP&interval=1m&limit=300"
 			)
 			const rawData = await res.json()
+			console.log("raw", rawData)
 			const formattedData = transformIntervalChartData(rawData)
-			// console.log(formattedData)
+			console.log(formattedData)
 			setIntervalTradingData(formattedData)
 			// setIntervalTradingData(formattedData)
 		}
