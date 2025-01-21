@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Slider } from "@/components/ui/slider"
+import { Slider } from "@/app/components/ui/slider"
 
 const leverageMarks = [
 	{ value: 0, label: "2X" },
@@ -25,7 +25,7 @@ const LeverageSlider = () => {
 	}
 
 	return (
-		<div className="flex flex-col gap-y-4 mb-6 ">
+		<div className="flex flex-col gap-y-4 mb-8 ">
 			<div className="flex justify-between">
 				<span className="text-white ">Leverage</span>
 				<span className="text-white ">{getCurrentLeverage(value[0])}</span>
@@ -53,7 +53,7 @@ const LeverageSlider = () => {
 					{leverageMarks.map((mark) => (
 						<span
 							key={mark.value}
-							className="text-gray-400 text-xs"
+							className="text-gray-400 text-xs pt-2"
 							style={{ transform: "translateX(50%)" }}
 						>
 							{mark.label}

@@ -8,6 +8,8 @@ import {
 	ISeriesApi,
 } from "lightweight-charts"
 import { TradingData } from "../utils/transform-chart"
+import { Skeleton } from "@/app/components/ui/skeleton"
+import SkeletonLoadingChart from "./SkeletonLoadingChart"
 
 interface TradingChartProps {
 	liveTradingData: TradingData | null
@@ -26,10 +28,11 @@ const TradingChart: React.FC<TradingChartProps> = ({
 	liveTradingData,
 	intervalTradingData,
 }) => {
-	const chartContainerRef = useRef<HTMLDivElement>(null)
+	const chartContainerRef = useRef<HTMLDivElement>()
 	const chartRef = useRef<IChartApi | null>(null)
 	const seriesRef = useRef<ISeriesApi<"Candlestick"> | null>(null)
 	const [hoveredData, setHoveredData] = useState<OHLCData>()
+	const [isLoading, setIsLoading] = useState(false)
 
 	useEffect(() => {
 		if (chartRef.current) {
@@ -45,8 +48,10 @@ const TradingChart: React.FC<TradingChartProps> = ({
 	}, [liveTradingData])
 
 	useEffect(() => {
-		if (!intervalTradingData || !chartContainerRef.current) return
-
+		if (!intervalTradingData || !chartContainerRef.current) {
+			setIsLoading(true)
+			return
+		}
 		chartRef.current = createChart(chartContainerRef.current, {
 			layout: {
 				background: { type: ColorType.Solid, color: "#161514" },
@@ -71,17 +76,22 @@ const TradingChart: React.FC<TradingChartProps> = ({
 			wickUpColor: "#26a69a",
 			wickDownColor: "#ef5350",
 		})
+
 		seriesRef.current.setData(intervalTradingData)
 
 		const handleResize = () => {
 			if (chartRef.current && chartContainerRef.current) {
 				chartRef.current.applyOptions({
 					width: chartContainerRef.current.clientWidth,
+					height: chartContainerRef.current.clientHeight,
 				})
 			}
 		}
 
 		window.addEventListener("resize", handleResize)
+		setIsLoading(false)
+
+		setTimeout(handleResize, 0)
 
 		return () => {
 			window.removeEventListener("resize", handleResize)
@@ -108,10 +118,16 @@ const TradingChart: React.FC<TradingChartProps> = ({
 					<span>C {hoveredData?.close.toFixed(2)}</span>
 				</div>
 			</div> */}
+
+			{isLoading && <SkeletonLoadingChart />}
 			<div
 				ref={chartContainerRef}
-				className=" h-[551px]"
+				className={`h-[650px] ${isLoading ? "hidden" : ""}`}
 			/>
+			{/* <div
+				ref={chartContainerRef}
+				className="h-[551px]"
+			/> */}
 		</div>
 	)
 }

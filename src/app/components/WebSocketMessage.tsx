@@ -82,7 +82,7 @@ const WebSocketComponent: React.FC = () => {
 					<CoinDetails />
 					<FundingPriceToggle />
 					<div className="flex gap-x-4">
-						<div className="w-full">
+						<div className="w-full h-full">
 							<TradingChart
 								liveTradingData={liveTradingData}
 								intervalTradingData={intervalTradingData}
