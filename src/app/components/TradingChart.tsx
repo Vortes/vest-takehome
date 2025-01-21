@@ -48,8 +48,6 @@ const TradingChart: React.FC<TradingChartProps> = ({
 		if (!intervalTradingData || !chartContainerRef.current) return
 
 		chartRef.current = createChart(chartContainerRef.current, {
-			height: chartContainerRef.current.clientHeight,
-			width: chartContainerRef.current.clientWidth,
 			layout: {
 				background: { type: ColorType.Solid, color: "#161514" },
 				textColor: "#d1d4dc",
@@ -102,17 +100,17 @@ const TradingChart: React.FC<TradingChartProps> = ({
 
 	return (
 		<div>
-			<div className="absolute top-0 left-0 z-10 p-2 font-mono text-sm">
+			{/* <div className="absolute top-0 left-0 z-10 p-2 font-mono text-sm">
 				<div className="flex gap-4 text-[#26a69a]">
 					<span>O {hoveredData?.open.toFixed(2)}</span>
 					<span>H {hoveredData?.high.toFixed(2)}</span>
 					<span>L {hoveredData?.low.toFixed(2)}</span>
 					<span>C {hoveredData?.close.toFixed(2)}</span>
 				</div>
-			</div>
+			</div> */}
 			<div
 				ref={chartContainerRef}
-				className="w-3/4 h-[551px]"
+				className=" h-[551px]"
 			/>
 		</div>
 	)

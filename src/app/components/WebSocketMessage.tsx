@@ -6,6 +6,10 @@ import {
 	transformIntervalChartData,
 	transformLiveChartData,
 } from "../utils/transform-chart"
+import DetailPanel from "./DetailPanel"
+import Navbar from "./Navbar"
+import CoinDetails from "./CoinDetails"
+import FundingPriceToggle from "./FundingPriceToggle"
 
 const WebSocketComponent: React.FC = () => {
 	const [intervalTradingData, setIntervalTradingData] = useState<
@@ -70,10 +74,26 @@ const WebSocketComponent: React.FC = () => {
 	}, [])
 
 	return (
-		<TradingChart
-			liveTradingData={liveTradingData}
-			intervalTradingData={intervalTradingData}
-		/>
+		<>
+			<div className="flex flex-col gap-y-6">
+				<Navbar />
+
+				<div className="flex flex-col gap-y-4">
+					<CoinDetails />
+					<FundingPriceToggle />
+					<div className="flex gap-x-4">
+						<div className="w-full">
+							<TradingChart
+								liveTradingData={liveTradingData}
+								intervalTradingData={intervalTradingData}
+							/>
+						</div>
+
+						<DetailPanel />
+					</div>
+				</div>
+			</div>
+		</>
 	)
 }
 
