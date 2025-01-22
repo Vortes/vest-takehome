@@ -1,9 +1,9 @@
-import WebSocketComponent from "./components/WebSocketMessage"
+import App from "./components"
 
 export default function Home() {
 	return (
 		<>
-			<WebSocketComponent />
+			<App />
 		</>
 	)
 }

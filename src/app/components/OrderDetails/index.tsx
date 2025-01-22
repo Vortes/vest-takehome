@@ -17,7 +17,7 @@ const DetailPanel = () => {
 			<LeverageSlider />
 			<OrderFee />
 			<OrderAdvancedDetails />
-			<Button className="uppercase">Buy / Long</Button>
+			<Button className="uppercase my-auto">Buy / Long</Button>
 		</div>
 	)
 }

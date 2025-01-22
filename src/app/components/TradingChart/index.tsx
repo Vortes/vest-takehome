@@ -7,32 +7,46 @@ import {
 	IChartApi,
 	ISeriesApi,
 } from "lightweight-charts"
-import { TradingData } from "../../utils/transform-chart"
-import { Skeleton } from "@/app/components/ui/skeleton"
+import {
+	TradingData,
+	transformIntervalChartData,
+} from "../../utils/transform-chart"
 import SkeletonLoadingChart from "../SkeletonLoadingChart"
+import useWebsocket from "@/app/hooks/useWebsocket"
 
-interface TradingChartProps {
-	liveTradingData: TradingData | null
-	intervalTradingData: TradingData[] | null
-}
-
-interface OHLCData {
-	time: string
+interface OHLCData extends TradingData {
+	time: number
 	open: number
 	high: number
 	low: number
 	close: number
 }
 
-const TradingChart: React.FC<TradingChartProps> = ({
-	liveTradingData,
-	intervalTradingData,
-}) => {
+const TradingChart = () => {
 	const chartContainerRef = useRef<HTMLDivElement>()
 	const chartRef = useRef<IChartApi | null>(null)
 	const seriesRef = useRef<ISeriesApi<"Candlestick"> | null>(null)
+
 	const [hoveredData, setHoveredData] = useState<OHLCData>()
-	const [isLoading, setIsLoading] = useState(false)
+	const [isLoading, setIsLoading] = useState(true)
+	const [intervalTradingData, setIntervalTradingData] = useState<
+		TradingData[] | null
+	>()
+
+	const [isReady, liveTradingData] = useWebsocket()
+
+	useEffect(() => {
+		async function fetchIntervalTradingData() {
+			const res = await fetch(
+				"https://server-mmdev.vest.exchange/v2/klines?symbol=ETH-PERP&interval=1m&limit=300"
+			)
+			const rawData = await res.json()
+			const formattedData = transformIntervalChartData(rawData)
+			setIntervalTradingData(formattedData)
+		}
+
+		fetchIntervalTradingData()
+	}, [])
 
 	useEffect(() => {
 		if (chartRef.current) {
@@ -91,7 +105,7 @@ const TradingChart: React.FC<TradingChartProps> = ({
 		window.addEventListener("resize", handleResize)
 		setIsLoading(false)
 
-		setTimeout(handleResize, 0)
+		setTimeout(handleResize, 1)
 
 		return () => {
 			window.removeEventListener("resize", handleResize)
@@ -110,24 +124,33 @@ const TradingChart: React.FC<TradingChartProps> = ({
 
 	return (
 		<div>
-			{/* <div className="absolute top-0 left-0 z-10 p-2 font-mono text-sm">
-				<div className="flex gap-4 text-[#26a69a]">
-					<span>O {hoveredData?.open.toFixed(2)}</span>
-					<span>H {hoveredData?.high.toFixed(2)}</span>
-					<span>L {hoveredData?.low.toFixed(2)}</span>
-					<span>C {hoveredData?.close.toFixed(2)}</span>
-				</div>
-			</div> */}
-
 			{isLoading && <SkeletonLoadingChart />}
+
 			<div
 				ref={chartContainerRef}
-				className={`h-[650px] ${isLoading ? "hidden" : ""}`}
-			/>
-			{/* <div
-				ref={chartContainerRef}
-				className="h-[551px]"
-			/> */}
+				className={`relative h-[650px] ${isLoading ? "hidden" : ""}`}
+			>
+				<div className="absolute top-8 left-2 z-10 p-2 font-mono text-sm">
+					<div className="flex gap-4 text-[#26a69a]">
+						<p>
+							<span className="text-white">O</span>{" "}
+							{hoveredData?.open.toFixed(2)}
+						</p>
+						<p>
+							<span className="text-white">H</span>{" "}
+							{hoveredData?.high.toFixed(2)}
+						</p>
+						<p>
+							<span className="text-white">L</span>{" "}
+							{hoveredData?.low.toFixed(2)}
+						</p>
+						<p>
+							<span className="text-white">C</span>{" "}
+							{hoveredData?.close.toFixed(2)}
+						</p>
+					</div>
+				</div>
+			</div>
 		</div>
 	)
 }
