@@ -23,7 +23,7 @@ interface OHLCData extends TradingData {
 }
 
 const TradingChart = () => {
-	const chartContainerRef = useRef<HTMLDivElement>()
+	const chartContainerRef = useRef<HTMLDivElement>(null)
 	const chartRef = useRef<IChartApi | null>(null)
 	const seriesRef = useRef<ISeriesApi<"Candlestick"> | null>(null)
 
@@ -115,6 +115,7 @@ const TradingChart = () => {
 		}
 	}, [intervalTradingData])
 
+	// TODO: use prev trading data while the new one is loading in
 	useEffect(() => {
 		if (liveTradingData && seriesRef.current) {
 			setHoveredData(liveTradingData)
@@ -130,6 +131,7 @@ const TradingChart = () => {
 				ref={chartContainerRef}
 				className={`relative h-[650px] ${isLoading ? "hidden" : ""}`}
 			>
+				{/* TODO: make accurate to figma (include title & volume) */}
 				<div className="absolute top-8 left-2 z-10 p-2 font-mono text-sm">
 					<div className="flex gap-4 text-[#26a69a]">
 						<p>
