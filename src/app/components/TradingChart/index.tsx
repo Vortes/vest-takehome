@@ -7,9 +7,9 @@ import {
 	IChartApi,
 	ISeriesApi,
 } from "lightweight-charts"
-import { TradingData } from "../utils/transform-chart"
+import { TradingData } from "../../utils/transform-chart"
 import { Skeleton } from "@/app/components/ui/skeleton"
-import SkeletonLoadingChart from "./SkeletonLoadingChart"
+import SkeletonLoadingChart from "../SkeletonLoadingChart"
 
 interface TradingChartProps {
 	liveTradingData: TradingData | null

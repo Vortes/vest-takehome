@@ -1,5 +1,5 @@
-import { Search, Bell, ChevronDown } from "lucide-react"
-import { CarotDown } from "./icons"
+import { Search, Bell } from "lucide-react"
+import { CarotDown } from "../icons"
 
 const Navbar = () => {
 	return (

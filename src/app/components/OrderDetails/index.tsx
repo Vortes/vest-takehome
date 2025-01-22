@@ -1,12 +1,12 @@
 "use client"
 
 import { Button } from "@/app/components/ui/button"
-import LeverageSlider from "../LeverageSlider"
 import OrderType from "./OrderType"
 import OrderSize from "./OrderSize"
 import OrderFee from "./OrderFee"
 import OrderPosition from "./OrderPosition"
 import OrderAdvancedDetails from "./OrderAdvancedDetails"
+import LeverageSlider from "./LeverageSlider"
 
 const DetailPanel = () => {
 	return (

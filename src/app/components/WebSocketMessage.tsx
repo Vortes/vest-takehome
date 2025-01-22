@@ -1,15 +1,15 @@
 "use client"
 import { useEffect, useState } from "react"
-import TradingChart from "./TradingChart"
 import {
 	TradingData,
 	transformIntervalChartData,
 	transformLiveChartData,
 } from "../utils/transform-chart"
 import DetailPanel from "./OrderDetails"
-import Navbar from "./Navbar"
-import FundingPriceToggle from "./FundingPriceToggle"
 import CoinDetails from "./CoinDetails"
+import Navbar from "./Navbar/Navbar"
+import FundingPriceToggle from "./PriceFundingToggle/FundingPriceToggle"
+import TradingChart from "./TradingChart"
 
 const WebSocketComponent: React.FC = () => {
 	const [intervalTradingData, setIntervalTradingData] = useState<
