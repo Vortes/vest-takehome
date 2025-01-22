@@ -6,10 +6,10 @@ import {
 	transformIntervalChartData,
 	transformLiveChartData,
 } from "../utils/transform-chart"
-import DetailPanel from "./DetailPanel"
+import DetailPanel from "./OrderDetails"
 import Navbar from "./Navbar"
-import CoinDetails from "./CoinDetails"
 import FundingPriceToggle from "./FundingPriceToggle"
+import CoinDetails from "./CoinDetails"
 
 const WebSocketComponent: React.FC = () => {
 	const [intervalTradingData, setIntervalTradingData] = useState<
