@@ -1,0 +1,1 @@
+self.__REACT_LOADABLE_MANIFEST="{\"app/components/TradingChart/index.tsx -> ./EmojiPicker\":{\"id\":\"app/components/TradingChart/index.tsx -> ./EmojiPicker\",\"files\":[\"static/chunks/_app-pages-browser_src_app_components_TradingChart_EmojiPicker_tsx.js\"]}}"
