@@ -4,8 +4,9 @@ import dynamic from "next/dynamic"
 import { DndContext } from "@dnd-kit/core"
 const EmojiPicker = dynamic(() => import("./EmojiPicker"), { ssr: false })
 import Chart from "./Chart"
-import { useState } from "react"
+import { Dispatch, FC, SetStateAction, useState } from "react"
 import { TradingData } from "@/app/utils/transform-chart"
+import { MarketType } from "@/app/utils/enums"
 
 export interface OHLCData extends TradingData {
 	time: number
@@ -15,7 +16,15 @@ export interface OHLCData extends TradingData {
 	close: number
 }
 
-const TradingChart = () => {
+interface TradingChartProps {
+	selectedMarket: MarketType
+	setSelectedMarket: Dispatch<SetStateAction<MarketType>>
+}
+
+const TradingChart: FC<TradingChartProps> = ({
+	selectedMarket,
+	setSelectedMarket,
+}) => {
 	const [hoveredData, setHoveredData] = useState<OHLCData>()
 	const [dragStarted, setDragStarted] = useState(false)
 	const [emojiTimestamp, setEmojiTimestamp] = useState<number | null>(null)
@@ -56,6 +65,8 @@ const TradingChart = () => {
 					emojiTimestamp={emojiTimestamp}
 					emojiTopPosition={emojiTopPosition}
 					selectedEmoji={selectedEmoji}
+					selectedMarket={selectedMarket}
+					setSelectedMarket={setSelectedMarket}
 				/>
 				<EmojiPicker dragStarted={dragStarted} />
 			</div>

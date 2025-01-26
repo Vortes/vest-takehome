@@ -1,7 +1,17 @@
+import { Dispatch, FC, SetStateAction } from "react"
 import CoinIcon from "./CoinIcon"
 import StatsContainer from "./StatsContainer"
+import { MarketType } from "@/app/utils/enums"
 
-const CoinDetails = () => {
+interface CoinDetailsProps {
+	selectedMarket: MarketType
+	setSelectedMarket: Dispatch<SetStateAction<MarketType>>
+}
+
+const CoinDetails: FC<CoinDetailsProps> = ({
+	selectedMarket,
+	setSelectedMarket,
+}) => {
 	const coinStats = [
 		{ title: "Price", content: "$31,119.01" },
 		{ title: "24H Change", content: "+22.3 USDC (+7.5$)" },
@@ -11,7 +21,10 @@ const CoinDetails = () => {
 	]
 	return (
 		<div className="flex justify-between border-b border-b-black_secondary py-2">
-			<CoinIcon />
+			<CoinIcon
+				selectedMarket={selectedMarket}
+				setSelectedMarket={setSelectedMarket}
+			/>
 			{coinStats.map((item, index) => (
 				<StatsContainer
 					key={index}

@@ -12,18 +12,11 @@ import {
 	ISeriesApi,
 	UTCTimestamp,
 } from "lightweight-charts"
-import {
-	Dispatch,
-	FC,
-	SetStateAction,
-	useEffect,
-	useRef,
-	useState,
-} from "react"
+import { Dispatch, FC, SetStateAction, useEffect, useRef } from "react"
 import SkeletonLoadingChart from "../SkeletonLoadingChart"
 import { OHLCData } from "."
 import { useQuery } from "@tanstack/react-query"
-import { Button } from "../ui/button"
+import { MarketType } from "@/app/utils/enums"
 
 interface ChartProps {
 	hoveredData: OHLCData | undefined
@@ -31,6 +24,8 @@ interface ChartProps {
 	emojiTimestamp: number | null
 	emojiTopPosition: number | null
 	selectedEmoji: string | null
+	selectedMarket: MarketType
+	setSelectedMarket: Dispatch<SetStateAction<MarketType>>
 }
 
 const Chart: FC<ChartProps> = ({
@@ -39,12 +34,13 @@ const Chart: FC<ChartProps> = ({
 	emojiTimestamp,
 	emojiTopPosition,
 	selectedEmoji,
+	selectedMarket,
+	setSelectedMarket,
 }) => {
 	const chartContainerRef = useRef<HTMLDivElement>(null)
 	const chartRef = useRef<IChartApi | null>(null)
 	const seriesRef = useRef<ISeriesApi<"Candlestick"> | null>(null)
 	const [isReady, liveTradingData] = useWebsocket()
-	const [selectedMarket, setSelectedMarket] = useState("ETH-PERP")
 
 	const {
 		isPending,
@@ -128,7 +124,7 @@ const Chart: FC<ChartProps> = ({
 		}
 	}, [tradingData, setHoveredData])
 
-	//TODO: find out a more efficient way to do this lol
+	//TODO: only updating when chart rerenders
 	useEffect(() => {
 		if (
 			!chartContainerRef.current ||
@@ -149,12 +145,12 @@ const Chart: FC<ChartProps> = ({
 	}, [emojiTimestamp, emojiTopPosition])
 
 	// TODO: use prev trading data while the new one is loading in
-	useEffect(() => {
-		if (liveTradingData && seriesRef.current) {
-			setHoveredData(liveTradingData)
-			seriesRef.current.update(liveTradingData)
-		}
-	}, [liveTradingData, setHoveredData])
+	// useEffect(() => {
+	// 	if (liveTradingData && seriesRef.current) {
+	// 		setHoveredData(liveTradingData)
+	// 		seriesRef.current.update(liveTradingData)
+	// 	}
+	// }, [liveTradingData, setHoveredData])
 
 	if (isError) return
 
