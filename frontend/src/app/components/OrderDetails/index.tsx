@@ -5,6 +5,7 @@ import OrderFee from "./OrderFee"
 import OrderPosition from "./OrderPosition"
 import OrderAdvancedDetails from "./OrderAdvancedDetails"
 import LeverageSlider from "./LeverageSlider"
+import ConfettiButton from "./ConfettiButton"
 
 const DetailPanel = () => {
 	return (
@@ -16,7 +17,7 @@ const DetailPanel = () => {
 			<OrderFee />
 			<OrderAdvancedDetails />
 			{/* TODO: make button placement accurate to figma */}
-			<Button className="uppercase my-auto">Buy / Long</Button>
+			<ConfettiButton />
 		</div>
 	)
 }

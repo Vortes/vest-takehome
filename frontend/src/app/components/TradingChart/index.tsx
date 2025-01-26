@@ -22,11 +22,12 @@ const TradingChart = () => {
 	const [emojiTopPosition, setEmojiTopPosition] = useState<number | null>(null)
 	const [selectedEmoji, setSelectedEmoji] = useState<string | null>(null)
 
-	const handleDragStart = (e) => {
+	const handleDragStart = () => {
 		setDragStarted(true)
 	}
 
 	const handleDragEnd = (e) => {
+		setDragStarted(false)
 		if (e.over && e.over.id === "trading-chart") {
 			const { active, over } = e
 
