@@ -13,17 +13,19 @@ import { positionsLine } from "./positions"
 class EmojiPaneRenderer implements ISeriesPrimitivePaneRenderer {
 	_x: number
 	_y: number
-	constructor(x: number, y: number) {
+	_emoji: string
+	constructor(x: number, y: number, emoji: string) {
 		this._x = x
 		this._y = y
+		this._emoji = emoji
 	}
 	draw(target: CanvasRenderingTarget2D): void {
 		target.useBitmapCoordinateSpace((scope) => {
 			const position = positionsLine(this._x, scope.horizontalPixelRatio)
+			const position_y = positionsLine(this._y, scope.horizontalPixelRatio)
 			const ctx = scope.context
 			ctx.font = "32px serif"
-			console.log("plugin y: ", this._y)
-			ctx.fillText("🚀", position.position, this._y)
+			ctx.fillText(this._emoji, position.position, position_y.position)
 		})
 	}
 }
@@ -37,15 +39,13 @@ class EmojiPaneView implements ISeriesPrimitivePaneView {
 
 	renderer(): ISeriesPrimitivePaneRenderer | null {
 		const timestamp = this._source.getTimestamp()
-		// const price = this._source.getPricescale()
 		const timeScale = this._source.getChart().timeScale()
-		// const priceScale = this._source.getSeries()
 
 		const x = timeScale.timeToCoordinate(timestamp)
 		const y = this._source.getPricescale()
-		// const y = priceScale.priceToCoordinate(price)
-		if (x === null || y === null) return null
-		return new EmojiPaneRenderer(x, y)
+		const emoji = this._source.getEmoji()
+		if (x === null || y === null || emoji === null) return null
+		return new EmojiPaneRenderer(x, y, emoji)
 	}
 }
 
@@ -53,17 +53,20 @@ export class EmojiPlugin implements ISeriesPrimitive<Time> {
 	_chart: IChartApi
 	_series: ISeriesApi<SeriesType>
 	_paneViews: EmojiPaneView[]
+	_emoji: string
 	_timestamp: Time
 	_pricescale: number
 
 	constructor(
 		chart: IChartApi,
 		series: ISeriesApi<SeriesType>,
+		emoji: string,
 		timestamp: Time,
 		pricescale: number
 	) {
 		this._chart = chart
 		this._series = series
+		this._emoji = emoji
 		this._timestamp = timestamp
 		this._pricescale = pricescale
 		this._paneViews = [new EmojiPaneView(this)]
@@ -71,6 +74,10 @@ export class EmojiPlugin implements ISeriesPrimitive<Time> {
 
 	getChart(): IChartApi {
 		return this._chart
+	}
+
+	getEmoji(): string {
+		return this._emoji
 	}
 
 	getTimestamp(): Time {

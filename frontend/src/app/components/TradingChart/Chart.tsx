@@ -28,6 +28,7 @@ interface ChartProps {
 	setHoveredData: Dispatch<SetStateAction<OHLCData | undefined>>
 	emojiTimestamp: number | null
 	emojiTopPosition: number | null
+	selectedEmoji: string | null
 }
 
 const Chart: FC<ChartProps> = ({
@@ -35,6 +36,7 @@ const Chart: FC<ChartProps> = ({
 	setHoveredData,
 	emojiTimestamp,
 	emojiTopPosition,
+	selectedEmoji,
 }) => {
 	const chartContainerRef = useRef<HTMLDivElement>(null)
 	const chartRef = useRef<IChartApi | null>(null)
@@ -130,12 +132,14 @@ const Chart: FC<ChartProps> = ({
 			!chartContainerRef.current ||
 			!seriesRef.current ||
 			!chartRef.current ||
-			!emojiTopPosition
+			!emojiTopPosition ||
+			!selectedEmoji
 		)
 			return
 		const emojiPrimitive = new EmojiPlugin(
 			chartRef.current,
 			seriesRef.current,
+			selectedEmoji,
 			emojiTimestamp as UTCTimestamp,
 			emojiTopPosition
 		)

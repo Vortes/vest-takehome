@@ -20,6 +20,7 @@ const TradingChart = () => {
 	const [dragStarted, setDragStarted] = useState(false)
 	const [emojiTimestamp, setEmojiTimestamp] = useState<number | null>(null)
 	const [emojiTopPosition, setEmojiTopPosition] = useState<number | null>(null)
+	const [selectedEmoji, setSelectedEmoji] = useState<string | null>(null)
 
 	const handleDragStart = (e) => {
 		setDragStarted(true)
@@ -32,15 +33,9 @@ const TradingChart = () => {
 			if (hoveredData?.time) {
 				setEmojiTimestamp(hoveredData?.time)
 			}
-			console.log(hoveredData)
-
 			const scrollOffset = window.scrollY
 			const chartTopPosition = over.rect.top + scrollOffset
-
-			console.log(
-				"client y:",
-				active.rect.current.translated.top + scrollOffset - chartTopPosition
-			)
+			setSelectedEmoji(active.id)
 			setEmojiTopPosition(
 				active.rect.current.translated.top + scrollOffset - chartTopPosition
 			)
@@ -59,6 +54,7 @@ const TradingChart = () => {
 					setHoveredData={setHoveredData}
 					emojiTimestamp={emojiTimestamp}
 					emojiTopPosition={emojiTopPosition}
+					selectedEmoji={selectedEmoji}
 				/>
 				<EmojiPicker dragStarted={dragStarted} />
 			</div>
