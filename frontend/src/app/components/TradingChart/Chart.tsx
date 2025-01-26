@@ -22,6 +22,8 @@ import {
 } from "react"
 import SkeletonLoadingChart from "../SkeletonLoadingChart"
 import { OHLCData } from "."
+import { useQuery } from "@tanstack/react-query"
+import { Button } from "../ui/button"
 
 interface ChartProps {
 	hoveredData: OHLCData | undefined
@@ -41,34 +43,36 @@ const Chart: FC<ChartProps> = ({
 	const chartContainerRef = useRef<HTMLDivElement>(null)
 	const chartRef = useRef<IChartApi | null>(null)
 	const seriesRef = useRef<ISeriesApi<"Candlestick"> | null>(null)
-
-	const [intervalTradingData, setIntervalTradingData] = useState<
-		TradingData[] | null
-	>()
-	const [isLoading, setIsLoading] = useState(true)
-
 	const [isReady, liveTradingData] = useWebsocket()
+	const [selectedMarket, setSelectedMarket] = useState("ETH-PERP")
+
+	const {
+		isPending,
+		isError,
+		data: tradingData,
+	} = useQuery({
+		queryKey: ["tradingData", selectedMarket],
+		queryFn: ({ queryKey }) => fetchIntervalTradingData(queryKey[1]),
+	})
 
 	const { setNodeRef } = useDroppable({
 		id: "trading-chart",
 	})
 
-	useEffect(() => {
-		async function fetchIntervalTradingData() {
-			const res = await fetch(
-				"https://server-mmdev.vest.exchange/v2/klines?symbol=ETH-PERP&interval=1m&limit=300"
-			)
-			const rawData = await res.json()
-			const formattedData = transformIntervalChartData(rawData)
-			setIntervalTradingData(formattedData)
-		}
+	async function fetchIntervalTradingData(
+		market: string
+	): Promise<TradingData[]> {
+		setSelectedMarket(market)
+		const res = await fetch(
+			`https://server-mmdev.vest.exchange/v2/klines?symbol=${market}&interval=1m&limit=200`
+		)
+		const rawData = await res.json()
+		const formattedData = transformIntervalChartData(rawData)
+		return formattedData
+	}
 
-		fetchIntervalTradingData()
-	}, [])
-
 	useEffect(() => {
-		if (!intervalTradingData || !chartContainerRef.current) {
-			setIsLoading(true)
+		if (!chartContainerRef.current || !tradingData) {
 			return
 		}
 		chartRef.current = createChart(chartContainerRef.current, {
@@ -95,8 +99,7 @@ const Chart: FC<ChartProps> = ({
 			wickUpColor: "#26a69a",
 			wickDownColor: "#ef5350",
 		})
-
-		seriesRef.current.setData(intervalTradingData)
+		seriesRef.current.setData(tradingData)
 
 		const handleResize = () => {
 			if (chartRef.current && chartContainerRef.current) {
@@ -108,7 +111,6 @@ const Chart: FC<ChartProps> = ({
 		}
 
 		window.addEventListener("resize", handleResize)
-		setIsLoading(false)
 
 		setTimeout(handleResize, 1)
 
@@ -124,7 +126,7 @@ const Chart: FC<ChartProps> = ({
 			chartRef.current = null
 			seriesRef.current = null
 		}
-	}, [intervalTradingData, setHoveredData])
+	}, [tradingData, setHoveredData])
 
 	//TODO: find out a more efficient way to do this lol
 	useEffect(() => {
@@ -153,21 +155,26 @@ const Chart: FC<ChartProps> = ({
 			seriesRef.current.update(liveTradingData)
 		}
 	}, [liveTradingData, setHoveredData])
+
+	if (isError) return
+
 	return (
 		<>
 			<div
 				className="h-[600px] w-full"
 				ref={setNodeRef}
 			>
-				{isLoading && <SkeletonLoadingChart />}
+				{isPending && <SkeletonLoadingChart />}
 
 				<div
 					ref={chartContainerRef}
-					className={`z-0 relative h-full ${isLoading ? "hidden" : ""}`}
+					className={`z-0 relative h-full ${isPending ? "hidden" : ""}`}
 					onDragOver={(e) => e.preventDefault()}
 				>
 					{/* TODO: make accurate to figma (include title & volume) */}
-					<div className="absolute top-8 left-2 z-10 p-2 font-mono text-sm pointer-events-none">
+					<div
+						className={`absolute top-8 left-2 z-10 p-2 font-mono text-sm pointer-events-none`}
+					>
 						<div className="flex gap-4 text-[#26a69a]">
 							<p>
 								<span className="text-white">O</span>{" "}
