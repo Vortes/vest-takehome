@@ -9,12 +9,13 @@ const TimeIntervalPicker: FC<TimeIntervalPickerProps> = ({
 	setTimeInterval,
 }) => {
 	return (
+		//TODO: generate dynamically && break into components
 		<div className="bg-[#252525] rounded-full flex gap-x-4 w-fit px-4 py-2 items-center">
 			<p
 				onClick={() => setTimeInterval(TimeInterval.ONE_MINUTE)}
 				className="uppercase text-sm hover:cursor-pointer hover:text-teal"
 			>
-				1 min
+				1m
 			</p>
 			<p
 				onClick={() => setTimeInterval(TimeInterval.ONE_HOUR)}

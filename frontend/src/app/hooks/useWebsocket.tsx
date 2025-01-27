@@ -1,7 +1,11 @@
 import { useEffect, useState } from "react"
 import { TradingData, transformLiveChartData } from "../utils/transform-chart"
+import { MarketType, TimeInterval } from "../utils/enums"
 
-const useWebsocket = () => {
+const useWebsocket = (
+	timeInterval: TimeInterval,
+	selectedMarket: MarketType
+) => {
 	const [liveTradingData, setLiveTradingData] = useState<TradingData>()
 	const [isReady, setIsReady] = useState(false)
 
@@ -13,7 +17,7 @@ const useWebsocket = () => {
 			ws.send(
 				JSON.stringify({
 					method: "SUBSCRIBE",
-					params: ["ETH-PERP@kline_1m"],
+					params: [`${selectedMarket}@kline_${timeInterval}`],
 					id: 1,
 				})
 			)
@@ -45,7 +49,7 @@ const useWebsocket = () => {
 		return () => {
 			ws.close()
 		}
-	}, [])
+	}, [selectedMarket, timeInterval])
 
 	return [isReady, liveTradingData]
 }

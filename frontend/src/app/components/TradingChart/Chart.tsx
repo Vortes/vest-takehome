@@ -42,7 +42,7 @@ const Chart: FC<ChartProps> = ({
 	const chartContainerRef = useRef<HTMLDivElement>(null)
 	const chartRef = useRef<IChartApi | null>(null)
 	const seriesRef = useRef<ISeriesApi<"Candlestick"> | null>(null)
-	const [isReady, liveTradingData] = useWebsocket()
+	const [isReady, liveTradingData] = useWebsocket(timeInterval, selectedMarket)
 
 	const {
 		isPending,
@@ -148,12 +148,12 @@ const Chart: FC<ChartProps> = ({
 	}, [emojiTimestamp, emojiTopPosition])
 
 	// TODO: use prev trading data while the new one is loading in
-	// useEffect(() => {
-	// 	if (liveTradingData && seriesRef.current) {
-	// 		setHoveredData(liveTradingData)
-	// 		seriesRef.current.update(liveTradingData)
-	// 	}
-	// }, [liveTradingData, setHoveredData])
+	useEffect(() => {
+		if (liveTradingData && seriesRef.current) {
+			setHoveredData(liveTradingData)
+			seriesRef.current.update(liveTradingData)
+		}
+	}, [liveTradingData, setHoveredData])
 
 	if (isError) return
 
