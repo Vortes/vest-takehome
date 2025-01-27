@@ -29,21 +29,21 @@ const CoinIcon: FC<CoinIconProps> = ({ selectedMarket, setSelectedMarket }) => {
 						<ChevronsUpDown className="h-4 w-4" />
 					</Button>
 				</DropdownMenuTrigger>
-				<DropdownMenuContent className="w-32">
+				<DropdownMenuContent className="relative z-50 w-fit bg-black_secondary rounded-md">
 					<DropdownMenuItem
-						className="uppercase"
+						className="uppercase px-4 py-2"
 						onClick={() => setSelectedMarket(MarketType.ETH)}
 					>
 						Ethereum-PERP
 					</DropdownMenuItem>
 					<DropdownMenuItem
-						className="uppercase"
+						className="uppercase px-4 py-2"
 						onClick={() => setSelectedMarket(MarketType.BTC)}
 					>
 						Bitcoin-PERP
 					</DropdownMenuItem>
 					<DropdownMenuItem
-						className="uppercase"
+						className="uppercase px-4 py-2"
 						onClick={() => setSelectedMarket(MarketType.DODGE)}
 					>
 						Doge-PERP

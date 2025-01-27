@@ -15,7 +15,6 @@ const DetailPanel = () => {
 			<LeverageSlider />
 			<OrderFee />
 			<OrderAdvancedDetails />
-			{/* TODO: make button placement accurate to figma */}
 			<ConfettiButton />
 		</div>
 	)
