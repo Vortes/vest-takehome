@@ -1,4 +1,4 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+Theres still a couple small of visual UI improvements I'd like to fix such as the market dropdown menu, but the main features from the bonus sections are done!
 
 ## Getting Started
 
