@@ -16,19 +16,20 @@ const leverageMarks = [
 const LeverageSlider = () => {
 	const [value, setValue] = React.useState([0])
 
-	const getCurrentLeverage = (value: number) => {
-		const mark = leverageMarks.find((mark, index) => {
-			const nextMark = leverageMarks[index + 1]
-			return value >= mark.value && (!nextMark || value < nextMark.value)
-		})
-		return mark?.label || "0.00X"
+	const getCurrentLeverage = (sliderValue: number) => {
+		const closest = leverageMarks.reduce((prev, curr) =>
+			Math.abs(curr.value - sliderValue) < Math.abs(prev.value - sliderValue)
+				? curr
+				: prev
+		)
+		return closest.label
 	}
 
 	return (
-		<div className="flex flex-col gap-y-4 mb-8 ">
+		<div className="flex flex-col gap-y-4 mb-8">
 			<div className="flex justify-between">
-				<span className="text-white ">Leverage</span>
-				<span className="text-white ">{getCurrentLeverage(value[0])}</span>
+				<span className="text-white">Leverage</span>
+				<span className="text-white">{getCurrentLeverage(value[0])}</span>
 			</div>
 			<div className="relative">
 				<div className="absolute w-full flex justify-between px-2 -mt-1">
@@ -46,7 +47,6 @@ const LeverageSlider = () => {
 					value={value}
 					onValueChange={setValue}
 					max={100}
-					step={16.67}
 					className="w-full"
 				/>
 				<div className="absolute w-full flex justify-between mt-2">

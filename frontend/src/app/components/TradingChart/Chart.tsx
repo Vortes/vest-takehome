@@ -1,5 +1,4 @@
 import useWebsocket from "@/app/hooks/useWebsocket"
-import { EmojiPlugin } from "@/app/utils/emoji-plugin"
 import {
 	TradingData,
 	transformIntervalChartData,
@@ -18,7 +17,7 @@ import SkeletonLoadingChart from "../SkeletonLoadingChart"
 import { OHLCData } from "."
 import { useMutation, useQuery } from "@tanstack/react-query"
 import { MarketType, TimeInterval } from "@/app/utils/enums"
-import { timeStamp } from "console"
+import addEmojiPrimitive from "@/app/utils/addEmojiPrimitive"
 
 interface ChartProps {
 	hoveredData: OHLCData | undefined
@@ -44,7 +43,7 @@ const Chart: FC<ChartProps> = ({
 	const chartContainerRef = useRef<HTMLDivElement>(null)
 	const chartRef = useRef<IChartApi | null>(null)
 	const seriesRef = useRef<ISeriesApi<"Candlestick"> | null>(null)
-	const [isReady, liveTradingData] = useWebsocket(timeInterval, selectedMarket)
+	const [liveTradingData] = useWebsocket(timeInterval, selectedMarket)
 
 	const {
 		isPending,
@@ -54,6 +53,11 @@ const Chart: FC<ChartProps> = ({
 		queryKey: ["tradingData", selectedMarket, timeInterval],
 		queryFn: ({ queryKey }) =>
 			fetchIntervalTradingData(queryKey[1] as MarketType),
+	})
+
+	const { data: emojiDataFromServer } = useQuery({
+		queryKey: ["PersistedEmojis"],
+		queryFn: fetchEmojis,
 	})
 
 	const newEmojiPostMutation = useMutation({
@@ -73,9 +77,11 @@ const Chart: FC<ChartProps> = ({
 					timestamp: timestamp,
 					emoji: emoji,
 					position: position,
+					// no authentication so ill just hard code user.
 					userId: "user1",
 				}),
 			})
+
 			if (!res.ok) throw new Error("Failed to add reaction")
 			return res.json()
 		},
@@ -95,6 +101,12 @@ const Chart: FC<ChartProps> = ({
 		const rawData = await res.json()
 		const formattedData = transformIntervalChartData(rawData)
 		return formattedData
+	}
+
+	async function fetchEmojis() {
+		const res = await fetch("http://localhost:3001/getReactions")
+		const emojis = await res.json()
+		return emojis
 	}
 
 	useEffect(() => {
@@ -141,8 +153,10 @@ const Chart: FC<ChartProps> = ({
 		setTimeout(handleResize, 1)
 
 		const handler = chartRef.current.subscribeCrosshairMove((param) => {
-			const candleData = param.seriesData.get(seriesRef.current) as OHLCData
-			setHoveredData(candleData)
+			if (seriesRef.current) {
+				const candleData = param.seriesData.get(seriesRef.current) as OHLCData
+				setHoveredData(candleData)
+			}
 		})
 
 		return () => {
@@ -156,23 +170,20 @@ const Chart: FC<ChartProps> = ({
 
 	useEffect(() => {
 		if (
-			!chartContainerRef.current ||
 			!seriesRef.current ||
 			!chartRef.current ||
 			!emojiTopPosition ||
 			!selectedEmoji
 		)
 			return
-		const emojiPrimitive = new EmojiPlugin(
+
+		addEmojiPrimitive(
 			chartRef.current,
 			seriesRef.current,
 			selectedEmoji,
 			emojiTimestamp as UTCTimestamp,
 			emojiTopPosition
 		)
-		seriesRef.current.attachPrimitive(emojiPrimitive)
-
-		console.log(emojiPrimitive._timestamp)
 
 		newEmojiPostMutation.mutate({
 			timestamp: emojiTimestamp as UTCTimestamp,
@@ -181,15 +192,34 @@ const Chart: FC<ChartProps> = ({
 		})
 	}, [emojiTimestamp, emojiTopPosition, selectedEmoji])
 
-	// TODO: use prev trading data while the new one is loading in
-	// useEffect(() => {
-	// 	if (liveTradingData && seriesRef.current) {
-	// 		setHoveredData(liveTradingData)
-	// 		seriesRef.current.update(liveTradingData)
-	// 	}
-	// }, [liveTradingData, setHoveredData])
+	useEffect(() => {
+		if (!chartRef.current || !seriesRef.current || !emojiDataFromServer) return
+		emojiDataFromServer.forEach(
+			(emojiReaction: {
+				timestamp: number
+				emoji: string
+				position: number
+			}) => {
+				addEmojiPrimitive(
+					chartRef.current,
+					seriesRef.current,
+					emojiReaction.emoji,
+					emojiReaction.timestamp as UTCTimestamp,
+					emojiReaction.position
+				)
+			}
+		)
+	}, [tradingData, emojiDataFromServer])
 
-	if (isError) return
+	// TODO: use prev trading data while the new one is loading in
+	useEffect(() => {
+		if (liveTradingData && seriesRef.current) {
+			setHoveredData(liveTradingData)
+			seriesRef.current.update(liveTradingData)
+		}
+	}, [liveTradingData, setHoveredData])
+
+	if (isError) return null
 
 	return (
 		<>
@@ -202,7 +232,7 @@ const Chart: FC<ChartProps> = ({
 				<div
 					ref={chartContainerRef}
 					className={`z-0 relative h-full ${isPending ? "hidden" : ""}`}
-					onDragOver={(e) => e.preventDefault()}
+					onDragOver={(e: React.DragEvent) => e.preventDefault()}
 				>
 					{/* TODO: make accurate to figma (include title & volume) */}
 					<div

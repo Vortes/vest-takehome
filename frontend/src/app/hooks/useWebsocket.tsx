@@ -7,7 +7,6 @@ const useWebsocket = (
 	selectedMarket: MarketType
 ) => {
 	const [liveTradingData, setLiveTradingData] = useState<TradingData>()
-	const [isReady, setIsReady] = useState(false)
 
 	useEffect(() => {
 		const ws = new WebSocket("wss://devws.vest.exchange/ws-api?version=1.0")
@@ -21,7 +20,6 @@ const useWebsocket = (
 					id: 1,
 				})
 			)
-			setIsReady(true)
 		}
 
 		ws.onmessage = (event) => {
@@ -37,12 +35,10 @@ const useWebsocket = (
 		}
 
 		ws.onerror = (error) => {
-			setIsReady(false)
 			console.error("WebSocket error:", error)
 		}
 
 		ws.onclose = (e) => {
-			setIsReady(false)
 			console.log("WebSocket connection closed: ", e.code)
 		}
 
@@ -51,7 +47,7 @@ const useWebsocket = (
 		}
 	}, [selectedMarket, timeInterval])
 
-	return [isReady, liveTradingData]
+	return [liveTradingData]
 }
 
 export default useWebsocket

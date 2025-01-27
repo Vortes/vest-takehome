@@ -1,4 +1,4 @@
-import { Dispatch, FC, SetStateAction, useEffect } from "react"
+import { Dispatch, FC, SetStateAction } from "react"
 import CoinIcon from "./CoinIcon"
 import StatsContainer from "./StatsContainer"
 import { MarketType } from "@/app/utils/enums"
@@ -46,11 +46,6 @@ const CoinDetails: FC<CoinDetailsProps> = ({
 		queryFn: ({ queryKey }) => fetchLatestTicker(queryKey[1] as MarketType),
 	})
 
-	useEffect(() => {
-		if (!marketData) return
-		console.log(marketData)
-	}, [marketData])
-
 	return (
 		<div className="flex justify-between border-b border-b-black_secondary py-2">
 			<CoinIcon
@@ -63,11 +58,11 @@ const CoinDetails: FC<CoinDetailsProps> = ({
 				<>
 					<StatsContainer
 						title="Price"
-						content={marketData?.indexPrice}
+						content={marketData?.indexPrice ?? ""}
 					/>
 					<StatsContainer
 						title="1h Funding"
-						content={marketData?.oneHrFundingRate}
+						content={marketData?.oneHrFundingRate ?? ""}
 					/>
 				</>
 			)}

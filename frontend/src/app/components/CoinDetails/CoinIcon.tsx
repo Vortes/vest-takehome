@@ -1,6 +1,6 @@
-import { Dispatch, FC, SetStateAction, useEffect } from "react"
+import { Dispatch, FC, SetStateAction } from "react"
 import { BitcoinIcon } from "../icons"
-import { useQuery } from "@tanstack/react-query"
+import {} from "@tanstack/react-query"
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -18,12 +18,7 @@ const CoinIcon: FC<CoinIconProps> = ({ selectedMarket, setSelectedMarket }) => {
 	return (
 		<div className="flex pl-2 gap-x-2 items-center">
 			<BitcoinIcon />
-			{/* <p className="uppercase text-white my-auto font-semibold font-sans flex gap-x-1">
-				<span className="uppercase">{selectedMarket}</span>
-				<span className="uppercase">/</span>
-				<span className="uppercase">BITCOIN</span>
-			</p> */}
-
+			{/*INFO: ideally keep this info in the url so that it remains after refresh */}
 			<DropdownMenu>
 				<DropdownMenuTrigger asChild>
 					<Button

@@ -1,16 +1,17 @@
 "use client"
 
 import dynamic from "next/dynamic"
-import { DndContext } from "@dnd-kit/core"
+import { DndContext, DragEndEvent } from "@dnd-kit/core"
 const EmojiPicker = dynamic(() => import("./EmojiPicker"), { ssr: false })
 import Chart from "./Chart"
 import { Dispatch, FC, SetStateAction, useState } from "react"
 import { TradingData } from "@/app/utils/transform-chart"
-import { MarketType, TimeInterval, TimeIntervals } from "@/app/utils/enums"
+import { MarketType, TimeInterval } from "@/app/utils/enums"
 import TimeIntervalPicker from "./TimeIntervalPicker"
+import { UTCTimestamp } from "lightweight-charts"
 
 export interface OHLCData extends TradingData {
-	time: number
+	time: UTCTimestamp
 	open: number
 	high: number
 	low: number
@@ -41,7 +42,7 @@ const TradingChart: FC<TradingChartProps> = ({
 		setDragStarted(true)
 	}
 
-	const handleDragEnd = (e) => {
+	const handleDragEnd = (e: DragEndEvent) => {
 		setDragStarted(false)
 		if (e.over && e.over.id === "trading-chart") {
 			const { active, over } = e
@@ -51,9 +52,9 @@ const TradingChart: FC<TradingChartProps> = ({
 			}
 			const scrollOffset = window.scrollY
 			const chartTopPosition = over.rect.top + scrollOffset
-			setSelectedEmoji(active.id)
+			setSelectedEmoji(active.id as string)
 			setEmojiTopPosition(
-				active.rect.current.translated.top + scrollOffset - chartTopPosition
+				active.rect.current?.translated?.top + scrollOffset - chartTopPosition
 			)
 			setDragStarted(false)
 		}

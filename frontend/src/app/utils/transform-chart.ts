@@ -13,7 +13,7 @@ interface RawData {
 }
 
 export interface TradingData {
-	time: number
+	time: UTCTimestamp
 	open: number
 	high: number
 	low: number

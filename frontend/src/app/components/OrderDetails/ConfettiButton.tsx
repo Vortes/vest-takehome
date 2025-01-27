@@ -1,15 +1,26 @@
 "use client"
-import React, { useState } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import { Button } from "@/app/components/ui/button"
 import Confetti from "react-confetti-boom"
 
 const ConfettiButton = () => {
 	const [isLoading, setIsLoading] = useState(false)
 	const [showConfetti, setShowConfetti] = useState(false)
+	const chimeRef = useRef<HTMLAudioElement | null>(null)
+
+	useEffect(() => {
+		chimeRef.current = new Audio("/Ping Sound.wav")
+	})
 
 	const handleClick = async () => {
 		setIsLoading(true)
 		setShowConfetti(true)
+		setIsLoading(true)
+		try {
+			await chimeRef.current?.play()
+		} catch (err) {
+			console.error("Failed to play sound:", err)
+		}
 		await new Promise((resolve) => setTimeout(resolve, 2500))
 		setIsLoading(false)
 		setShowConfetti(false)
