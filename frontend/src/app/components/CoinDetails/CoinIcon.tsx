@@ -15,23 +15,6 @@ interface CoinIconProps {
 	setSelectedMarket: Dispatch<SetStateAction<MarketType>>
 }
 const CoinIcon: FC<CoinIconProps> = ({ selectedMarket, setSelectedMarket }) => {
-	const fetchLatestTicker = async () => {
-		const res = await fetch(
-			"https://server-mmdev.vest.exchange/v2/ticker/latest?symbols=BTC-PERP, ETH-PERP, DOGE-PERP"
-		)
-		const rawData = await res.json()
-		return rawData.tickers
-	}
-
-	const { data: marketData } = useQuery({
-		queryKey: ["ticker"],
-		queryFn: fetchLatestTicker,
-	})
-
-	useEffect(() => {
-		if (!marketData) return
-		console.log(marketData)
-	}, [marketData])
 	return (
 		<div className="flex pl-2 gap-x-2 items-center">
 			<BitcoinIcon />

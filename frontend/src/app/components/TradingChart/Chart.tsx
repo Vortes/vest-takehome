@@ -48,7 +48,8 @@ const Chart: FC<ChartProps> = ({
 		data: tradingData,
 	} = useQuery({
 		queryKey: ["tradingData", selectedMarket],
-		queryFn: ({ queryKey }) => fetchIntervalTradingData(queryKey[1]),
+		queryFn: ({ queryKey }) =>
+			fetchIntervalTradingData(queryKey[1] as MarketType),
 	})
 
 	const { setNodeRef } = useDroppable({
@@ -56,7 +57,7 @@ const Chart: FC<ChartProps> = ({
 	})
 
 	async function fetchIntervalTradingData(
-		market: string
+		market: MarketType
 	): Promise<TradingData[]> {
 		setSelectedMarket(market)
 		const res = await fetch(
