@@ -6,7 +6,8 @@ const EmojiPicker = dynamic(() => import("./EmojiPicker"), { ssr: false })
 import Chart from "./Chart"
 import { Dispatch, FC, SetStateAction, useState } from "react"
 import { TradingData } from "@/app/utils/transform-chart"
-import { MarketType } from "@/app/utils/enums"
+import { MarketType, TimeInterval, TimeIntervals } from "@/app/utils/enums"
+import TimeIntervalPicker from "./TimeIntervalPicker"
 
 export interface OHLCData extends TradingData {
 	time: number
@@ -27,9 +28,14 @@ const TradingChart: FC<TradingChartProps> = ({
 }) => {
 	const [hoveredData, setHoveredData] = useState<OHLCData>()
 	const [dragStarted, setDragStarted] = useState(false)
+
 	const [emojiTimestamp, setEmojiTimestamp] = useState<number | null>(null)
 	const [emojiTopPosition, setEmojiTopPosition] = useState<number | null>(null)
 	const [selectedEmoji, setSelectedEmoji] = useState<string | null>(null)
+
+	const [timeInterval, setTimeInterval] = useState<TimeInterval>(
+		TimeInterval.ONE_DAY
+	)
 
 	const handleDragStart = () => {
 		setDragStarted(true)
@@ -67,8 +73,12 @@ const TradingChart: FC<TradingChartProps> = ({
 					selectedEmoji={selectedEmoji}
 					selectedMarket={selectedMarket}
 					setSelectedMarket={setSelectedMarket}
+					timeInterval={timeInterval}
 				/>
-				<EmojiPicker dragStarted={dragStarted} />
+				<div className="flex gap-x-4">
+					<EmojiPicker dragStarted={dragStarted} />
+					<TimeIntervalPicker setTimeInterval={setTimeInterval} />
+				</div>
 			</div>
 		</DndContext>
 	)

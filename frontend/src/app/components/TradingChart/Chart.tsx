@@ -16,7 +16,7 @@ import { Dispatch, FC, SetStateAction, useEffect, useRef } from "react"
 import SkeletonLoadingChart from "../SkeletonLoadingChart"
 import { OHLCData } from "."
 import { useQuery } from "@tanstack/react-query"
-import { MarketType } from "@/app/utils/enums"
+import { MarketType, TimeInterval } from "@/app/utils/enums"
 
 interface ChartProps {
 	hoveredData: OHLCData | undefined
@@ -26,6 +26,7 @@ interface ChartProps {
 	selectedEmoji: string | null
 	selectedMarket: MarketType
 	setSelectedMarket: Dispatch<SetStateAction<MarketType>>
+	timeInterval: TimeInterval
 }
 
 const Chart: FC<ChartProps> = ({
@@ -36,6 +37,7 @@ const Chart: FC<ChartProps> = ({
 	selectedEmoji,
 	selectedMarket,
 	setSelectedMarket,
+	timeInterval,
 }) => {
 	const chartContainerRef = useRef<HTMLDivElement>(null)
 	const chartRef = useRef<IChartApi | null>(null)
@@ -47,7 +49,7 @@ const Chart: FC<ChartProps> = ({
 		isError,
 		data: tradingData,
 	} = useQuery({
-		queryKey: ["tradingData", selectedMarket],
+		queryKey: ["tradingData", selectedMarket, timeInterval],
 		queryFn: ({ queryKey }) =>
 			fetchIntervalTradingData(queryKey[1] as MarketType),
 	})
@@ -61,7 +63,7 @@ const Chart: FC<ChartProps> = ({
 	): Promise<TradingData[]> {
 		setSelectedMarket(market)
 		const res = await fetch(
-			`https://server-mmdev.vest.exchange/v2/klines?symbol=${market}&interval=1m&limit=200`
+			`https://server-mmdev.vest.exchange/v2/klines?symbol=${market}&interval=${timeInterval}&limit=200`
 		)
 		const rawData = await res.json()
 		const formattedData = transformIntervalChartData(rawData)
