@@ -34,7 +34,7 @@ const TradingChart: FC<TradingChartProps> = ({
 	const [selectedEmoji, setSelectedEmoji] = useState<string | null>(null)
 
 	const [timeInterval, setTimeInterval] = useState<TimeInterval>(
-		TimeInterval.ONE_DAY
+		TimeInterval.ONE_MINUTE
 	)
 
 	const handleDragStart = () => {

@@ -10,13 +10,15 @@ import {
 	createChart,
 	IChartApi,
 	ISeriesApi,
+	Time,
 	UTCTimestamp,
 } from "lightweight-charts"
 import { Dispatch, FC, SetStateAction, useEffect, useRef } from "react"
 import SkeletonLoadingChart from "../SkeletonLoadingChart"
 import { OHLCData } from "."
-import { useQuery } from "@tanstack/react-query"
+import { useMutation, useQuery } from "@tanstack/react-query"
 import { MarketType, TimeInterval } from "@/app/utils/enums"
+import { timeStamp } from "console"
 
 interface ChartProps {
 	hoveredData: OHLCData | undefined
@@ -52,6 +54,31 @@ const Chart: FC<ChartProps> = ({
 		queryKey: ["tradingData", selectedMarket, timeInterval],
 		queryFn: ({ queryKey }) =>
 			fetchIntervalTradingData(queryKey[1] as MarketType),
+	})
+
+	const newEmojiPostMutation = useMutation({
+		mutationFn: async ({
+			timestamp,
+			emoji,
+			position,
+		}: {
+			timestamp: Time
+			emoji: string
+			position: number
+		}) => {
+			const res = await fetch("http://localhost:3001/addReaction", {
+				method: "POST",
+				headers: { "Content-type": "application/json" },
+				body: JSON.stringify({
+					timestamp: timestamp,
+					emoji: emoji,
+					position: position,
+					userId: "user1",
+				}),
+			})
+			if (!res.ok) throw new Error("Failed to add reaction")
+			return res.json()
+		},
 	})
 
 	const { setNodeRef } = useDroppable({
@@ -127,7 +154,6 @@ const Chart: FC<ChartProps> = ({
 		}
 	}, [tradingData, setHoveredData])
 
-	//TODO: only updating when chart rerenders
 	useEffect(() => {
 		if (
 			!chartContainerRef.current ||
@@ -145,15 +171,23 @@ const Chart: FC<ChartProps> = ({
 			emojiTopPosition
 		)
 		seriesRef.current.attachPrimitive(emojiPrimitive)
-	}, [emojiTimestamp, emojiTopPosition])
+
+		console.log(emojiPrimitive._timestamp)
+
+		newEmojiPostMutation.mutate({
+			timestamp: emojiTimestamp as UTCTimestamp,
+			emoji: selectedEmoji,
+			position: emojiTopPosition,
+		})
+	}, [emojiTimestamp, emojiTopPosition, selectedEmoji])
 
 	// TODO: use prev trading data while the new one is loading in
-	useEffect(() => {
-		if (liveTradingData && seriesRef.current) {
-			setHoveredData(liveTradingData)
-			seriesRef.current.update(liveTradingData)
-		}
-	}, [liveTradingData, setHoveredData])
+	// useEffect(() => {
+	// 	if (liveTradingData && seriesRef.current) {
+	// 		setHoveredData(liveTradingData)
+	// 		seriesRef.current.update(liveTradingData)
+	// 	}
+	// }, [liveTradingData, setHoveredData])
 
 	if (isError) return
 

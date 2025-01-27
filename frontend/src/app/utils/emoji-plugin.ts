@@ -4,6 +4,8 @@ import {
 	ISeriesPrimitive,
 	ISeriesPrimitivePaneRenderer,
 	ISeriesPrimitivePaneView,
+	SeriesAttachedParameter,
+	SeriesOptionsMap,
 	SeriesType,
 	Time,
 } from "lightweight-charts"
@@ -21,10 +23,18 @@ class EmojiPaneRenderer implements ISeriesPrimitivePaneRenderer {
 	}
 	draw(target: CanvasRenderingTarget2D): void {
 		target.useBitmapCoordinateSpace((scope) => {
-			const position = positionsLine(this._x, scope.horizontalPixelRatio)
-			const position_y = positionsLine(this._y, scope.horizontalPixelRatio)
 			const ctx = scope.context
-			ctx.font = "32px serif"
+			const emojiWidthPixels = 32
+			const emojiWidthMedia = emojiWidthPixels / scope.horizontalPixelRatio
+
+			const position = positionsLine(
+				this._x,
+				scope.horizontalPixelRatio,
+				emojiWidthMedia
+			)
+			const position_y = positionsLine(this._y, scope.horizontalPixelRatio, -32)
+
+			ctx.font = `${emojiWidthPixels}px serif`
 			ctx.fillText(this._emoji, position.position, position_y.position)
 		})
 	}
@@ -94,5 +104,10 @@ export class EmojiPlugin implements ISeriesPrimitive<Time> {
 
 	paneViews() {
 		return this._paneViews
+	}
+
+	// to my understanding, redraws as soon as attached.
+	attached(param: SeriesAttachedParameter<Time, keyof SeriesOptionsMap>): void {
+		param.requestUpdate()
 	}
 }
