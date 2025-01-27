@@ -1,24 +1,22 @@
+// only cause its just one file
+declare var require: any
+
 const express = require("express")
+const cors = require("cors")
 const app = express()
+app.use(cors())
+app.use(express.json())
 const port = 3001
 
-let emojiReactions = {
-	"2024-06-24T00:00:00Z": [
-		{ userId: "user1", emoji: "🚀" },
-		{ userId: "user2", emoji: "😎" },
-	],
-	"2024-06-24T01:00:00Z": [
-		{ userId: "user3", emoji: "😡" },
-		{ userId: "user4", emoji: "😭" },
-	],
-}
+let emojiReactions = {}
 
 app.post("/addReaction", (req, res) => {
-	const { timestamp, userId, emoji } = req.body
+	const { timestamp, emoji, position, userId } = req.body
 	if (!emojiReactions[timestamp]) {
 		emojiReactions[timestamp] = []
 	}
-	emojiReactions[timestamp].push({ userId, emoji })
+	emojiReactions[timestamp].push({ userId, emoji, position })
+	console.log(emojiReactions)
 	res.status(200).send("Reaction added")
 })
 
